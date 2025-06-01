@@ -11,15 +11,18 @@
 	.code16gcc
 	.global printf
         .global memsize
+     
 	.section .text
 	
 printf:	
+         mov %cs, %ax   
+         mov %ax, %ds
 
 	mov   %cx, %bx
 	
         mov   $0x0e,%ah               
         mov   $0x0, %si  
-        
+
 
 
 loop:                                 
@@ -30,10 +33,11 @@ loop:
         add   $0x1, %si               
         jmp   loop    
 
+
+
 memsize:
-        
         int $0x12
-        ret
+        ret 
         
 
 end:

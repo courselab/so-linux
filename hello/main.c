@@ -11,55 +11,78 @@
 
 
 
-#include <stdio.h>
+#include "stdio.h"
 
 
-char *convert_kb_to_mb(int val_kb, char *buf) {
-    int val_mb;
-    char *p = buf;
-    char *p1, tmp_char;
-    int tmp_val_digit;
-
-
-    val_mb = val_kb / 1024;
-
- 
-    if (val_mb == 0 && val_kb < 1024) {
-        *p++ = '0';
-    } else {
-       
-        do {
-            tmp_val_digit = val_mb;
-            val_mb /= 10;
-            
-            *p++ = '0' + (tmp_val_digit - val_mb * 10);
-        } while (val_mb);
-    }
-
-    *p-- = '\0'; 
+char* int_to_char_buffer(int num, char* buffer) {
+    char* ptr = buffer;
+    char* ptr1 = buffer;
+    char tmp_char;
     
-   
-    for (p1 = buf; p1 < p; ++p1, --p) {
-        tmp_char = *p;
-        *p = *p1;
-        *p1 = tmp_char;
+
+    // Lida com o caso de num ser 0
+    if (num == 0) {
+        *ptr++ = '0';
+        *ptr = '\0'; // Adiciona o terminador nulo
+        return buffer;
     }
 
-    return buf; 
+    // Lida com números negativos
+    if (num < 0) {
+        *ptr++ = '-';
+        num = -num; // Trabalha com o valor absoluto
+    }
+
+    // Converte os dígitos individualmente
+    // Os dígitos são gerados na ordem inversa (ex: 123 -> 3, 2, 1)
+    while (num > 0) {
+        *ptr++ = (num % 10) + '0'; // Pega o último dígito e converte para ASCII
+        num /= 10;                 // Remove o último dígito
+    }
+
+    // Se houve sinal de negativo, o ponteiro ptr já avançou,
+    // então precisamos ajustar o ponteiro de início para a inversão.
+    // Se o número original era negativo, ptr1 aponta para o '-'.
+    // Caso contrário, ptr1 aponta para o início do buffer.
+    if (buffer[0] == '-') {
+        ptr1++; // Começa a inversão após o '-'
+    }
+
+    // Adiciona o terminador nulo
+    *ptr = '\0';
+    ptr--; // Volta para o último caractere válido antes do terminador
+
+    // Inverte a string de dígitos (agora a ordem está correta)
+    // Ex: "321" vira "123"
+    while (ptr1 < ptr) {
+        tmp_char = *ptr;
+        *ptr = *ptr1;
+        *ptr1 = tmp_char;
+        ptr--;
+        ptr1++;
+    }
+
+    return buffer; // Retorna o ponteiro para o início da string no buffer
 }
 
 
 int main(void)   
 {
-    char buffer[20];                   
+    char kb_buffer[20];
     int mem_kb = memsize();
+    const char * rs; 
 
     printf("Hello World");
-    convert_kb_to_mb(mem_kb, buffer); 
+    printf("\r\n"); 
     
 
-    printf(" ");
-    printf("Mem KB: ");
-    printf(buffer);                   
+    
+    /* Convert MB to string and print */
+    int_to_char_buffer(mem_kb, kb_buffer);
+    rs = kb_buffer;
+    printf("Memory Size KB:");
+    printf(rs);
+    
+    
     return 0;
 }

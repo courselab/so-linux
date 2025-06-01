@@ -14,6 +14,9 @@
 void __attribute__((fastcall, naked)) printf(const char *); 
 
 
-int  __attribute__((fastcall, naked)) memsize(void); 
+
+
+
+int __attribute__((fastcall, naked)) memsize(void); 
 
 #endif	
