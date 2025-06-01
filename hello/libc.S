@@ -11,7 +11,6 @@
 	.code16gcc
 	.global printf
         .global memsize
-
 	.section .text
 	
 printf:	
@@ -21,7 +20,7 @@ printf:
         mov   $0x0e,%ah               
         mov   $0x0, %si  
         
-        
+
 
 loop:                                 
         mov   (%bx, %si), %al           
@@ -32,7 +31,7 @@ loop:
         jmp   loop    
 
 memsize:
-        mov $0x0, %ax
+        
         int $0x12
         ret
         

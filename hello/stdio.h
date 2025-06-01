@@ -12,6 +12,8 @@
 #define E8_H
 
 void __attribute__((fastcall, naked)) printf(const char *); 
- unsigned short memsize(void); 
+
+
+int  __attribute__((fastcall, naked)) memsize(void); 
 
 #endif	
