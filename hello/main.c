@@ -70,19 +70,9 @@ int main(void)
 {
     char kb_buffer[20];
     int mem_kb = memsize();
-    const char * rs; 
 
-    printf("Hello World");
-    printf("\r\n"); 
-    
-
-    
-    /* Convert MB to string and print */
     int_to_char_buffer(mem_kb, kb_buffer);
-    rs = kb_buffer;
-    printf("Memory Size KB:");
-    printf(rs);
-    
-    
+    printf(kb_buffer);
+   
     return 0;
 }

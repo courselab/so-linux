@@ -15,8 +15,7 @@
 	.section .text
 	
 printf:	
-         mov %cs, %ax   
-         mov %ax, %ds
+        
 
 	mov   %cx, %bx
 	
@@ -25,7 +24,8 @@ printf:
 
 
 
-loop:                                 
+loop:                 
+                         
         mov   (%bx, %si), %al           
         cmp   $0x0, %al               
         je    end                    
