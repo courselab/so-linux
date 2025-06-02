@@ -1,0 +1,7 @@
+Escolhemos implementar a "conventional memory size (int 0x12)"
+Solução:
+1) No arquivo: Libc.S incluimos a label para a chamada dessa função que aloca retorna o valor no registrado ax. Definimos a label memsize para ser chamada pela main no c utilizando a rotina "int 0x12".
+2) Na biblioteca personalizada stdio.h incluimos a fastcall "memsize" do tipo int devido a rotina retornar um valor int.
+3) Na Main.C fizemos a chamada para Bios, convertemos o valor de int para char e imprimimos com a função printf que já havia sido implementada pelo professor em aula.
+4) No MakeFile acrescentamos a flag -fno-stack-protector para desativar a proteção de pilha.
+5) O valor que retorna é referente a arquitetura x86 de 16bits, retornando ao como 639KB/ 640KB
