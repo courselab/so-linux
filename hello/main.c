@@ -71,6 +71,7 @@ int main(void)
     char kb_buffer[20];
     int mem_kb = memsize();
 
+    
     int_to_char_buffer(mem_kb, kb_buffer);
     printf(kb_buffer);
    
