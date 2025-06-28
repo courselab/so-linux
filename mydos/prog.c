@@ -12,6 +12,6 @@
 
 int main()
 {
-  puts("Hello World\n");
+  puts("Mundo nao gira, capota!\n");
   return 0;
 }

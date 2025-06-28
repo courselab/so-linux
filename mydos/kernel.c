@@ -42,7 +42,7 @@ void shell()
 {
   int i;
   clear();
-  kwrite("TinyDOS 1.0\n");
+  kwrite("VIDOS 1.0\n");
 
   while (go_on)
   {
@@ -87,22 +87,29 @@ struct cmd_t cmds[] =
         {"help", f_help}, /* Print a help message.       */
         {"quit", f_quit}, /* Exit TyDOS.                 */
         {"hello", f_hello}, /* Execute an example program. */
+        {"list",f_list},
         {0, 0}};
 
 /* Build-in shell command: help. */
 
 void f_help()
 {
-  kwrite("...me, Obi-Wan, you're my only hope!\n\n");
-  kwrite("   But we can try also some commands:\n");
-  kwrite("      hello   (to run a sample user program\n");
-  kwrite("      quit    (to exit TyDOS)\n");
+  kwrite("...me, Confia pai!\n\n");
+  kwrite("  Voce pode tentar esses comandos:\n");
+  kwrite("      list    (to list the files) \n ");
+  kwrite("      hello   (para executar um programa hello-world\n");
+  kwrite("      quit    (para sair do VIDOS)\n");
 }
 
 void f_quit()
 {
-  kwrite("Program halted. Bye.\r\n");
+  kwrite("Programa encerrado, falow\r\n");
   go_on = 0;
+}
+
+void f_list()
+{
+kwrite("Arquivos aqui po \r\n");
 }
 
 /* Built-in shell command: example.
