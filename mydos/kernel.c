@@ -103,7 +103,7 @@ void f_help()
 
 void f_quit()
 {
-  kwrite("Programa encerrado, falow\r\n");
+  kwrite("VIDOS Programa encerrado, falow\r\n");
   go_on = 0;
 }
 

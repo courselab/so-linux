@@ -73,4 +73,7 @@ libtydos.a : libtydos.o
 .PHONY: clean
 
 clean:
-	rm -f *.bin *.o *~ *.s *.a
+	rm -f *.bin *.o *~ *.s *.a *.img
+
+
+
