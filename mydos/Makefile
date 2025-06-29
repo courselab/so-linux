@@ -145,25 +145,3 @@ clean:
 include bintools.mk
 
 
-# -----------------------------------------------------------------------------
-# REGRAS PARA IMAGEM DE DISCO E BOOT
-# -----------------------------------------------------------------------------
-
-# Alvo para criar a imagem de disco bootável com o seu DOS
-# Este alvo depende do binário do seu DOS (kernel)
-disk.img: $(dos).bin
-	
-	rm -f $@
-	dd if=/dev/zero of=$@ count=2880 bs=512
-	dd if=$(dos).bin of=$@ conv=notrunc seek=1 bs=512
-
-
-run: disk.img
-	qemu-system-i386 -fda $< # '-fda' para bootar de uma imagem de disquete
-
-# Adicione 'run' e 'disk.img' aos alvos PHONY
-.PHONY: clean run # 'clean' já existia, 'run' é novo, 'disk.img' também se torna PHONY se não for um arquivo intermediário
-
-# Expanda a regra 'clean' para remover também as imagens de disco
-clean:
-	rm -f $(dos).bin $(progs) *.o *~ *.s *.a *.img
