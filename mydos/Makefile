@@ -70,7 +70,7 @@ libvidos.a : libvidos.o
 vifsedit: vifsedit.c
 	gcc vifsedit.c -lm -o vifsedit
 
-disc.img: vifsedit
+disk.img: vifsedit
 	dd if=/dev/zero of=disk.img count=2880
 	./format disk.img
 
