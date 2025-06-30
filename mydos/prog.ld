@@ -21,10 +21,10 @@ SECTIONS
         .bin :
 	{
           *.o   (.text .data .bss .rodata) /* Command line objects. */
-	  libtydos.o (.text .data .bss .rodata) /* Runtime library. */
+	  libvidos.o (.text .data .bss .rodata) /* Runtime library. */
 	}
 }
-INPUT(libtydos.a)		/* Link with the TyDOS user library. */
+INPUT(libvidos.a)		/* Link with the ViDOS user library. */
 
 
 

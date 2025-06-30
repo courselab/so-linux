@@ -11,21 +11,21 @@ CC=gcc
 MAKE=make
 
 dos=$(shell basename $$(realpath .))
-
+dos = vidos
 # Build the OS and an example user program.
 
 # Link all objects needed by the OS.
 
 $(dos).bin : bootloader.o bios1.o kernel.o kaux.o bios2.o logo.o syscall.o
-	ld -melf_i386 -T tydos.ld --orphan-handling=discard $^ -o $@
+	ld -melf_i386 -T vidos.ld --orphan-handling=discard $^ -o $@
 
 # Here we are statically linking the user program 'prob.bin' into the kernel,
 # so as to simulate the execution of a user program. If we were to actually load
-# and execute an external program, we should remove 'prog.o' and 'libtydos.o'
+# and execute an external program, we should remove 'prog.o' and 'libvidos.o'
 # from the list of pre-requisites, and edit the linker script accordingly.
 # Comment out the following line if this is the case.
 
-$(dos).bin : prog.o libtydos.o
+$(dos).bin : prog.o libvidos.o
 
 # Rules to build objects from either C or assembly code.
 
@@ -39,7 +39,7 @@ bootloader.o : bios1.h kernel.h
 kernel.o : bios1.h bios2.h kernel.h kaux.h
 kaux.o:    bios2.h kaux.h
 
-$(dos).bin : .EXTRA_PREREQS = rt0.o tydos.ld
+$(dos).bin : .EXTRA_PREREQS = rt0.o vidos.ld
 
 # Rules to build the user programs
 # You would add new programs to this variable if bulding other user programs.
@@ -47,100 +47,44 @@ $(dos).bin : .EXTRA_PREREQS = rt0.o tydos.ld
 
 progs = prog.bin
 
-$(progs)  : %.bin : %.o libtydos.a
+$(progs)  : %.bin : %.o libvidos.a
 	ld -melf_i386 -T prog.ld --orphan-handling=discard $< -o $@
 
-$(progs:%.bin=%.o) : %.o : %.c tydos.h
+$(progs:%.bin=%.o) : %.o : %.c vidos.h
 	gcc -m16 -O0 --freestanding -fno-pic $(NO_CF_PROTECT) -c $< -o $@
 
-$(progs:%.bin=%.o) : tydos.h
+$(progs:%.bin=%.o) : vidos.h
 
 $(progs:%.bin=%.o) : .EXTRA_PREREQS = prog.ld
 
 # Recipes to build the user library.
 
-libtydos.o: libtydos.c tydos.h
+libvidos.o: libvidos.c vidos.h
 	gcc -m16 -O0 --freestanding -fno-pic $(NO_CF_PROTECT) -c  $< -o $@
 
-libtydos.o : tydos.h
+libvidos.o : vidos.h
 
-libtydos.a : libtydos.o
+libvidos.a : libvidos.o
 	ar rcs $@ $^
+
+vifsedit: vifsedit.c
+	gcc vifsedit.c -lm -o vifsedit
+
+disc.img: vifsedit
+	dd if=/dev/zero of=disk.img count=2880
+	./format disk.img
 
 # Housekeeping.
 
 .PHONY: clean
 
 clean:
-	rm -f *.bin *.o *~ *.s *.a
-# By default, the bootable program name will be tydos.bin
+	rm -f *.bin *.o *~ *.s *.a *img
+# By default, the bootable program name will be vidos.bin
 # If you export this directory to extend the example as part of a programming
 # exercise, redefine $(dos) to reflect your own DOS name, say
 # dos = "amazingOS"
 
-dos=$(shell basename $$(realpath .))
-
-# Build the OS and an example user program.
-
-# Link all objects needed by the OS.
-
-$(dos).bin : bootloader.o bios1.o kernel.o kaux.o bios2.o logo.o syscall.o
-	ld -melf_i386 -T tydos.ld --orphan-handling=discard $^ -o $@
-
-# Here we are statically linking the user program 'prob.bin' into the kernel,
-# so as to simulate the execution of a user program. If we were to actually load
-# and execute an external program, we should remove 'prog.o' and 'libtydos.o'
-# from the list of pre-requisites, and edit the linker script accordingly.
-# Comment out the following line if this is the case.
-
-$(dos).bin : prog.o libtydos.o
-
-# Rules to build objects from either C or assembly code.
-
-%.o : %.c
-	gcc -m16 -O0 --freestanding -fno-pic $(NO_CF_PROTECT) -c  $< -o $@
-
-%.o : %.S
-	as -32 $< -o $@
-
-bootloader.o : bios1.h kernel.h
-kernel.o : bios1.h bios2.h kernel.h kaux.h
-kaux.o:    bios2.h kaux.h
-
-$(dos).bin : .EXTRA_PREREQS = rt0.o tydos.ld
-
-# Rules to build the user programs
-# You would add new programs to this variable if bulding other user programs.
-# The user library is automatically added by the linker script.
-
-progs = prog.bin
-
-$(progs)  : %.bin : %.o libtydos.a
-	ld -melf_i386 -T prog.ld --orphan-handling=discard $< -o $@
-
-$(progs:%.bin=%.o) : %.o : %.c tydos.h
-	gcc -m16 -O0 --freestanding -fno-pic $(NO_CF_PROTECT) -c $< -o $@
-
-$(progs:%.bin=%.o) : tydos.h
-
-$(progs:%.bin=%.o) : .EXTRA_PREREQS = prog.ld
-
-# Recipes to build the user library.
-
-libtydos.o: libtydos.c tydos.h
-	gcc -m16 -O0 --freestanding -fno-pic $(NO_CF_PROTECT) -c  $< -o $@
-
-libtydos.o : tydos.h
-
-libtydos.a : libtydos.o
-	ar rcs $@ $^
-
-# Housekeeping.
-
-.PHONY: clean
-
-clean:
-	rm -f *.bin *.o *~ *.s *.a
 # SYSeg's  convenience rules (not related to the example itself)
 include bintools.mk
 

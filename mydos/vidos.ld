@@ -9,7 +9,7 @@
  *  vitoremerique <vitort.emerique@hotmail.com>
  */
 
-/* This is the linker script used to build TyDOS. */
+/* This is the linker script used to build vidos. */
 
 OUTPUT_FORMAT(binary)		/* Output flat binary (no structure). */
 SECTIONS
@@ -52,7 +52,7 @@ SECTIONS
 	.prog_example :
 	{
 	  prog.o      (.text .data .bss. .rodata)
-	  libtydos.o  (.text .data .bss. .rodata)
+	  libvidos.o  (.text .data .bss. .rodata)
 	}
 
 	_KERNEL_SIZE = . - _KERNEL_ADDR; /* How many bytes we'll read.      */

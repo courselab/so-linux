@@ -92,10 +92,12 @@
 
  4) Create a tyfs disk image.
 
-    Add a rule in your 'Makefile' to create a zeroed 1.44M floppy image
+    Add a rule in your 'Build.mk' to create a zeroed 1.44M floppy image
     'disk.img' (see 'img' rule in 'eg/tyfs/build.mk).
 
     You can use the script 'eg/tyfs/format' to help with that.
+    *Com o dd + o format criar regra no make file, para make disk criar a imagem e formatar.
+    *O argumento do dd para conseguir copiar o binário no disco é seek e não skip como estava no README
 
  6) Make the disk image boot your DOS program.
 
@@ -109,7 +111,7 @@
 
     Try it with QEMU x86 emulator.
 
-       make mydos.bin/run
+       make disk.img/run
 
     should do it (replace 'mydos' with your DOS name).
 
