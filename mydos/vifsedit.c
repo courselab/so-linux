@@ -66,18 +66,50 @@ int arg_count(int, int, const char *); /* Check for required number of args. */
 
 /* There we go. */
 
-int main()
+int f_open (int, const char** );
+
+#define PROGRAM "tyfsedit"
+char usage[] =
+    "\n"
+    "Usage : " PROGRAM " [options] <file-name>\n\n"
+    "        Options \n"
+    "        -h             this help message\n"
+    "\n\n";
+
+
+int main(int argc, char **argv)
 {
-  int i, argc;
+  int i, argi, opt;
   char buffer[CMD_LINE_LEN];
-  char *argv[MAX_ARGS];
+  char *args[MAX_ARGS];
 
   /* Reset header info. */
 
   memset(&fs_header, 0, sizeof(fs_header));
 
-  printf("TyDOS file manager.\n");
+  printf("TyFS file manager.\n");
 
+
+ while ((opt = getopt(argc, argv, "hvs:b")) != -1)
+  {
+    switch (opt)
+    {
+    case 'h':
+      printf("%s", usage);
+      exit(EXIT_SUCCESS);
+      break;
+    default:
+      fprintf(stderr, "%s", usage);
+      exit(EXIT_FAILURE);
+      break;
+    }
+  }
+
+  
+  if (argc > 1)
+    f_open (2, (const char*[]) {"open", argv[1], NULL});
+
+  
   /* Main command interpreter loop. */
 
   while (go_on)
@@ -95,19 +127,19 @@ int main()
     fgets(buffer, CMD_LINE_LEN - 1, stdin);
 
     i = 0;
-    while ((argv[i] = strtok(i == 0 ? buffer : NULL, " \t\n")))
+    while ((args[i] = strtok(i == 0 ? buffer : NULL, " \t\n")))
       i++;
-    argc = i;
+    argi = i;
 
     /* Execute command. */
 
     i = 0;
-    if (argv[0])
+    if (args[0])
       while (cmds[i].func)
       {
-        if (!strcmp(argv[0], cmds[i].name))
+        if (!strcmp(args[0], cmds[i].name))
         {
-          cmds[i].func(argc, (const char **)argv);
+          cmds[i].func(argi, (const char **)args);
           break;
         }
         i++;
@@ -123,13 +155,13 @@ int main()
  *  Arguments: <volume-name>
  */
 
-int f_open(int argc, const char **argv)
+int f_open(int argi, const char **args)
 {
   int rs;
 
   /* Precondition check. */
 
-  if (!arg_count(argc, 2, "Usage: open <volume-name>"))
+  if (!arg_count(argi, 2, "Usage: open <volume-name>"))
     return 1;
 
   /* Open the volume. */
@@ -137,8 +169,8 @@ int f_open(int argc, const char **argv)
   if (volume_fp)
     fclose(volume_fp);
 
-  volume_fp = fopen(argv[1], "r+");
-  sysfault(!volume_fp, 1, argv[1]);
+  volume_fp = fopen(args[1], "r+");
+  sysfault(!volume_fp, 1, args[1]);
 
   /* Read volume header. */
 
@@ -147,7 +179,7 @@ int f_open(int argc, const char **argv)
 
   /* Set the prompt string. */
 
-  volume_name = strdup(argv[1]);
+  volume_name = strdup(args[1]);
 
   return 0;
 }
@@ -156,7 +188,7 @@ int f_open(int argc, const char **argv)
  *  Arguments: (none)
  */
 
-int f_close(int argc, const char **argv)
+int f_close(int argi, const char **args)
 {
   int rs;
 
@@ -179,7 +211,7 @@ int f_close(int argc, const char **argv)
  *  Arguments: (none)
  */
 
-int f_help(int argc, const char **argv)
+int f_help(int argi, const char **args)
 {
   printf("Available commands\n\n"
          "open   <image>      open a volume image in the host system\n"
@@ -202,7 +234,7 @@ int f_help(int argc, const char **argv)
  *  Arguments: (none)
  */
 
-int f_quit(int argc, const char **argv)
+int f_quit(int argi, const char **args)
 {
   printf("Bye.\n");
   go_on = 0;
@@ -213,7 +245,7 @@ int f_quit(int argc, const char **argv)
  *  Arguments: (none)
  */
 
-int f_format(int argc, const char **argv)
+int f_format(int argi, const char **args)
 {
   int i, rs;
   float number_of_entries;
@@ -252,11 +284,10 @@ int f_format(int argc, const char **argv)
 
   printf("Maximum number of files will be          : %d\n", fs_header.number_of_file_entries);
 
-  fs_header.unused_space = (int)
-                                   fs_header.total_number_of_sectors *
-                               512 -
-                           fs_header.number_of_boot_sectors * 512 -
-                           fs_header.number_of_file_entries * (DIR_ENTRY_LEN + fs_header.max_file_size * 512);
+  fs_header.unused_space = (unsigned int)
+                           fs_header.total_number_of_sectors * 512 -
+                           fs_header.number_of_boot_sectors  * 512 -
+                           fs_header.number_of_file_entries  * (DIR_ENTRY_LEN + fs_header.max_file_size * 512);
 
   printf("Unused space                             : %d (%.2f KBytes)\n",
          fs_header.unused_space, (float)fs_header.unused_space / 1024);
@@ -279,7 +310,7 @@ int f_format(int argc, const char **argv)
  * Arguments: (none).
  */
 
-int f_info(int argc, const char **argv)
+int f_info(int argi, const char **args)
 {
 
   /* Check preconditions. */
@@ -288,15 +319,15 @@ int f_info(int argc, const char **argv)
     return 1;
 
   printf("Volume info reported by FS_HEADER header:\n");
-  printf("phisical volume size           : %d blocks (%d bytes) \n",
+  printf("phisical volume size           : %u blocks (%d bytes) \n",
          fs_header.total_number_of_sectors, fs_header.total_number_of_sectors * 512);
-  printf("number of reserved sectors     : %d blocks\n",
+  printf("number of reserved sectors     : %u blocks\n",
          fs_header.number_of_boot_sectors);
-  printf("maximum number of file entries : %d files\n",
+  printf("maximum number of file entries : %u files\n",
          fs_header.number_of_file_entries);
-  printf("maximum supported file size    : %d bytes (%.2f KiB)\n",
+  printf("maximum supported file size    : %u bytes (%.2f KiB)\n",
          fs_header.max_file_size * 512, (float)fs_header.max_file_size / 2);
-  printf("unused space                   : %d bytes (%.2f KiB)\n",
+  printf("unused space                   : %u bytes (%.2f KiB)\n",
          fs_header.unused_space, (float)fs_header.unused_space / 1024);
 
   return 0;
@@ -306,7 +337,7 @@ int f_info(int argc, const char **argv)
  * Arguments: (none)
  */
 
-int f_list(int argc, const char **argv)
+int f_list(int argi, const char **args)
 {
   int i;
   char name[DIR_ENTRY_LEN];
@@ -342,9 +373,9 @@ int f_list(int argc, const char **argv)
  *        Quotes are not parsed as in usual shell grammar.
  */
 
-int f_put(int argc, const char **argv)
+int f_put(int argi, const char **args)
 {
-  int i, j, c, rs;
+  int i, count, c, rs;
   char buffer[DIR_ENTRY_LEN];
   char out_file_name;
   FILE *fpin;
@@ -354,7 +385,7 @@ int f_put(int argc, const char **argv)
   if (!volume_is_open() || !volume_is_fs_header())
     return 1;
 
-  if (!arg_count(argc, 2, "Usage: put <file-name>"))
+  if (!arg_count(argi, 2, "Usage: put <file-name>"))
     return 1;
 
   /* Position at the begining of the directory reagion. */
@@ -368,9 +399,9 @@ int f_put(int argc, const char **argv)
   {
     fread(buffer, DIR_ENTRY_LEN, 1, volume_fp);
 
-    if (!strncmp(buffer, argv[1], DIR_ENTRY_LEN))
+    if (!strncmp(buffer, args[1], DIR_ENTRY_LEN))
     {
-      printf("File '%s' already exists in the volume\n", argv[1]);
+      printf("File '%s' already exists in the volume\n", args[1]);
       return 1;
     }
 
@@ -393,17 +424,17 @@ int f_put(int argc, const char **argv)
 
   /* Open the local file (in the host). */
 
-  fpin = fopen(argv[1], "r");
-  sysfault(!fpin, 1, argv[1]);
+  fpin = fopen(args[1], "r");
+  sysfault(!fpin, 1, args[1]);
 
   /* Copy the file in to the volume. */
 
-  j = 0;
+  count = 0;
   while (((c = fgetc(fpin)) != EOF) &&
-         (j < fs_header.max_file_size * 512))
+         (count < fs_header.max_file_size * 512))
   {
     fwrite(&c, 1, 1, volume_fp);
-    j++;
+    count++;
   }
   if (ferror(fpin))
     sysfatal(1);
@@ -420,10 +451,13 @@ int f_put(int argc, const char **argv)
             DIR_ENTRY_LEN * i,
         SEEK_SET);
 
-  strncpy(buffer, basename((char *)argv[1]), DIR_ENTRY_LEN);
+  strncpy(buffer, basename((char *)args[1]), DIR_ENTRY_LEN);
   fwrite(buffer, DIR_ENTRY_LEN, 1, volume_fp);
 
-  printf("File '%s' copied at entry %d\n", argv[1], i);
+  printf("File '%s' copied at entry %d\n", args[1], i);
+  if (count >= fs_header.max_file_size * 512)
+    printf ("Content length exceeds limit (%u bytes) and was truncated.\n",
+	    fs_header.max_file_size*512);
 
   return 0;
 }
@@ -441,7 +475,7 @@ int f_put(int argc, const char **argv)
  *        Quotes are not parsed as in usual shell grammar.
  */
 
-int f_get(int argc, const char **argv)
+int f_get(int argi, const char **args)
 {
   int i, c;
   FILE *fpout;
@@ -453,7 +487,7 @@ int f_get(int argc, const char **argv)
   if (!volume_is_open() || !volume_is_fs_header())
     return 1;
 
-  if (!arg_count(argc, 2, "Usage: get [-d] <file-name>"))
+  if (!arg_count(argi, 2, "Usage: get [-d] <file-name>"))
     return 1;
 
   /* Position at the begining of the file directory region. */
@@ -467,12 +501,12 @@ int f_get(int argc, const char **argv)
   {
     fread(buffer, DIR_ENTRY_LEN, 1, volume_fp);
     i++;
-  } while (strncmp(buffer, argv[1], DIR_ENTRY_LEN) &&
+  } while (strncmp(buffer, args[1], DIR_ENTRY_LEN) &&
            (i < fs_header.number_of_file_entries));
 
   if (i == fs_header.number_of_file_entries)
   {
-    printf("File '%s' not found in the volume\n", argv[1]);
+    printf("File '%s' not found in the volume\n", args[1]);
     return 1;
   }
 
@@ -486,14 +520,14 @@ int f_get(int argc, const char **argv)
 
   /* Determine the destination stream. */
 
-  if (argc < 3)
-    out_file_name = (char *)argv[1];
+  if (argi < 3)
+    out_file_name = (char *)args[1];
   else
   {
-    if (!strcmp(argv[2], ":dump"))
+    if (!strcmp(args[2], ":dump"))
       out_file_name = NULL;
     else
-      out_file_name = (char *)argv[2];
+      out_file_name = (char *)args[2];
   }
 
   if (out_file_name)
@@ -526,7 +560,7 @@ int f_get(int argc, const char **argv)
  * Arguments: <file-name>
  */
 
-int f_delete(int argc, const char **argv)
+int f_delete(int argi, const char **args)
 {
   int i;
   char buffer[DIR_ENTRY_LEN];
@@ -536,7 +570,7 @@ int f_delete(int argc, const char **argv)
   if (!volume_is_open() || !volume_is_fs_header())
     return 1;
 
-  if (!arg_count(argc, 2, "Usage: get <file-name>"))
+  if (!arg_count(argi, 2, "Usage: get <file-name>"))
     return 1;
 
   /* Position at the begining of the directory region. */
@@ -550,12 +584,12 @@ int f_delete(int argc, const char **argv)
   {
     fread(buffer, DIR_ENTRY_LEN, 1, volume_fp);
     i++;
-  } while (strncmp(buffer, argv[1], DIR_ENTRY_LEN) &&
+  } while (strncmp(buffer, args[1], DIR_ENTRY_LEN) &&
            (i < fs_header.number_of_file_entries));
 
   if (i == fs_header.number_of_file_entries)
   {
-    printf("File '%s' not found in the volume\n", argv[1]);
+    printf("File '%s' not found in the volume\n", args[1]);
     return 1;
   }
 
@@ -574,7 +608,7 @@ int f_delete(int argc, const char **argv)
 /* List local files in the host.
    Arguments: (like the 'ls' utility from GNU coreutils). */
 
-int f_hlist(int argc, const char **argv)
+int f_hlist(int argi, const char **args)
 {
   int pid, status, rs;
   pid = fork();
@@ -583,7 +617,7 @@ int f_hlist(int argc, const char **argv)
     wait(&status);
   else
   {
-    rs = execvp("ls", (char *const *)argv);
+    rs = execvp("ls", (char *const *)args);
     sysfatal(!rs);
   }
 }
@@ -644,12 +678,12 @@ int volume_is_fs_header()
   return 1;
 }
 
-/* if the 'argc' greather or equal than 'number', return 1;
+/* if the 'argi' greather or equal than 'number', return 1;
    otherwise, prints a message and return 0. */
 
-int arg_count(int argc, int number, const char *msg)
+int arg_count(int argi, int number, const char *msg)
 {
-  if (argc < number)
+  if (argi < number)
   {
     printf("%s\n", msg);
     return 0;
