@@ -23,8 +23,8 @@ shift $((OPTIND -1))
 FILE=$1
 IMG=$2
 
-if ! test -f tyfsedit ; then
-    echo "tyfsedit not found (have you built it?)"
+if ! test -f vifsedit ; then
+    echo "vifsedit not found (have you built it?)"
     exit 1
 fi
 
@@ -55,5 +55,5 @@ quit
 EOF
 )
 
-echo "$cmd" | ./tyfsedit
+echo "$cmd" | ./vifsedit
 
