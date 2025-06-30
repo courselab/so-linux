@@ -6,7 +6,7 @@
  *    This file is part of SYSeg, available at https://gitlab.com/monaco/syseg.
  */
 
-/* This program can be used to format a disk image with a TyFS file system
+/* This program can be used to format a disk image with a Vifs file system
    and to manipulate files in the volume.*/
 
 #include <libgen.h>
@@ -61,14 +61,14 @@ struct cmd_t
 extern struct cmd_t cmds[];
 
 int volume_is_open();                  /* Check if volume is open.          */
-int volume_is_fs_header();             /* Check if volume has a TyFS heder. */
+int volume_is_fs_header();             /* Check if volume has a Vifs heder. */
 int arg_count(int, int, const char *); /* Check for required number of args. */
 
 /* There we go. */
 
 int f_open (int, const char** );
 
-#define PROGRAM "tyfsedit"
+#define PROGRAM "vifsedit"
 char usage[] =
     "\n"
     "Usage : " PROGRAM " [options] <file-name>\n\n"
@@ -87,7 +87,7 @@ int main(int argc, char **argv)
 
   memset(&fs_header, 0, sizeof(fs_header));
 
-  printf("TyFS file manager.\n");
+  printf("ViFS file manager.\n");
 
 
  while ((opt = getopt(argc, argv, "hvs:b")) != -1)
@@ -217,7 +217,7 @@ int f_help(int argi, const char **args)
          "open   <image>      open a volume image in the host system\n"
          "close               close a previously opened volume\n"
          "info                show open volume's file system information\n"
-         "format              format the open volume with tyFS\n"
+         "format              format the open volume with Vifs\n"
          "list                list files in the open volume\n"
          "put    <file>       copy file from host to the open volume\n"
          "get    <file>       copy file from the open volume to host\n"
@@ -665,7 +665,7 @@ int volume_is_open()
   return 1;
 }
 
-/* If the volume currently open has a TyFS heander return 1;
+/* If the volume currently open has a Vifs heander return 1;
    otherwise, prints a message and return 0.*/
 
 int volume_is_fs_header()

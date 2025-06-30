@@ -10,7 +10,7 @@
 CC=gcc
 MAKE=make
 
-#dos=$(shell basename $$(realpath .))
+dos=$(shell basename $$(realpath .))
 dos = vidos
 # Build the OS and an example user program.
 
@@ -64,13 +64,17 @@ libvidos.o : vidos.h
 
 libvidos.a : libvidos.o
 	ar rcs $@ $^
+	
+#Make disk image
+
+reserved_blockd =  30
 
 vifsedit: vifsedit.c
 	gcc vifsedit.c -lm -o vifsedit
 
 disk.img: vifsedit
 	dd if=/dev/zero of=disk.img count=2880
-	./format disk.img
+	./format -r $(reserved_blockd) disk.img
 
 # Housekeeping.
 
