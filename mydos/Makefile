@@ -7,6 +7,10 @@
 #  and includes modifications made by the following author(s):
 #  vitoremerique <vitort.emerique@hotmail.com>
 
+# By default, the bootable program name will be vidos.bin
+# If you export this directory to extend the example as part of a programming
+# exercise, redefine $(dos) to reflect your own DOS name, say
+# dos = "amazingOS"
 CC=gcc
 MAKE=make
 
@@ -67,14 +71,15 @@ libvidos.a : libvidos.o
 	
 #Make disk image
 
-reserved_blockd =  30
+reserved_blocks =  30
 
 vifsedit: vifsedit.c
 	gcc vifsedit.c -lm -o vifsedit
 
-disk.img: vifsedit
+disk.img: vifsedit vidos.bin
 	dd if=/dev/zero of=disk.img count=2880
-	./format -r $(reserved_blockd) disk.img
+	./format -r $(reserved_blocks) disk.img
+	dd if=vidos.bin of=disk.img conv=notrunc obs=1 seek=16
 
 # Housekeeping.
 
@@ -82,10 +87,6 @@ disk.img: vifsedit
 
 clean:
 	rm -f *.bin *.o *~ *.s *.a *img
-# By default, the bootable program name will be vidos.bin
-# If you export this directory to extend the example as part of a programming
-# exercise, redefine $(dos) to reflect your own DOS name, say
-# dos = "amazingOS"
 
 # SYSeg's  convenience rules (not related to the example itself)
 include bintools.mk

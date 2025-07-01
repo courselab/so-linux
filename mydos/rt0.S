@@ -12,8 +12,9 @@
 	.global boot_drive	/* The drive where stage1 was loaded from.*/
 	.text
 
-	jmp _start		/* Provision for BIOSes that assume the   */
-	. = . + 60		/* media is FAT and has a BBP in the MBR. */
+	#jmp _start		/* Provision for BIOSes that assume the   */
+	#. = . + 60		/* media is FAT and has a BBP in the MBR. */
+	#Quando fazemos boot a partir do disk.img não é necessário fazer o jump da fat, pois já foi feito jump de 16 bites no makefile
 
 _start:
 
