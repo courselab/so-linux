@@ -20,7 +20,7 @@ dos = vidos
 
 # Link all objects needed by the OS.
 
-$(dos).bin : bootloader.o bios1.o kernel.o kaux.o bios2.o logo.o syscall.o
+$(dos).bin : bootloader.o bios1.o kernel.o kaux.o bios2.o logo.o syscall.o vifs.o
 	ld -melf_i386 -T vidos.ld --orphan-handling=discard $^ -o $@
 
 # Here we are statically linking the user program 'prob.bin' into the kernel,
@@ -80,6 +80,9 @@ disk.img: vifsedit vidos.bin
 	dd if=/dev/zero of=disk.img count=2880
 	./format -r $(reserved_blocks) disk.img
 	dd if=vidos.bin of=disk.img conv=notrunc obs=1 seek=16
+	./put file1.txt disk.img
+	./put file2.txt disk.img
+	./put file3.txt disk.img
 
 # Housekeeping.
 

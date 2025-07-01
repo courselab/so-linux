@@ -17,7 +17,7 @@
 #include "bios1.h"  /* For kwrite() etc.            */
 #include "bios2.h"  /* For kread() etc.             */
 #include "kaux.h"   /* Auxiliary kernel functions.  */
-
+#include "vifs.h"
 /* Kernel's entry function. */
 
 void kmain(void)
@@ -87,7 +87,7 @@ struct cmd_t cmds[] =
         {"help", f_help}, /* Print a help message.       */
         {"quit", f_quit}, /* Exit TyDOS.                 */
         {"hello", f_hello}, /* Execute an example program. */
-        {"list",f_list},
+        {"list", f_list},
         {0, 0}};
 
 /* Build-in shell command: help. */
@@ -107,10 +107,7 @@ void f_quit()
   go_on = 0;
 }
 
-void f_list()
-{
-kwrite("Arquivos aqui po \r\n");
-}
+
 
 /* Built-in shell command: example.
 
